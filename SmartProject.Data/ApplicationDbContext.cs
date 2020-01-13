@@ -38,7 +38,9 @@ namespace SmartProject.Data
             base.OnModelCreating(modelBuilder);
         }
 
-        public DbSet<Employee> employees { get; set; }
+        public DbSet<Employee> Employees { get; set; }
+
+        public DbSet<Supplier> Supplier { get; set; }
 
     }
 }

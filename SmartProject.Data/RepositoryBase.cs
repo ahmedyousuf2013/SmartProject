@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace SmartProject.Data
 {
@@ -29,16 +30,28 @@ namespace SmartProject.Data
         public void Create(T entity)
         {
             this.ApplicationDbContext.Set<T>().Add(entity);
+            this.ApplicationDbContext.SaveChanges();
         }
 
         public void Update(T entity)
         {
             this.ApplicationDbContext.Set<T>().Update(entity);
+            this.ApplicationDbContext.SaveChanges();
         }
 
         public void Delete(T entity)
         {
             this.ApplicationDbContext.Set<T>().Remove(entity);
+            this.ApplicationDbContext.SaveChanges();
+        }
+
+        public async Task<T> SaveAsync(T entity) 
+        {
+            this.ApplicationDbContext.Set<T>().Add(entity);
+         
+            await this.ApplicationDbContext.SaveChangesAsync();
+
+            return entity;
         }
     }
 }

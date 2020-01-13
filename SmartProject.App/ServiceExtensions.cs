@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 using SmartProject.Data;
 using SmartProject.Models;
 using SmartProject.Repository.EmployeeRepository;
+using SmartProject.Repository.SupplierRepository;
 using SmartProject.RepositoryWrapper;
 using System;
 using System.Collections.Generic;
@@ -19,6 +20,7 @@ namespace SmartProject
 {
     public static class ServiceExtensions
     {
+        readonly  static string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         public static void ConfigureCors(this IServiceCollection services)
         {
             services.AddCors(options =>
@@ -28,10 +30,21 @@ namespace SmartProject
                     .AllowAnyMethod()
                     .AllowAnyHeader());
             });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(MyAllowSpecificOrigins,
+                builder =>
+                {
+                    builder.WithOrigins("https://localhost:5001/",
+                                        "https://localhost:5001/");
+                });
+            });
         }
         public static void ConfigureRepositoryContainer(this IServiceCollection services) 
         {
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+            services.AddScoped<ISupplierRepository, SupplierRepository>();
         }
 
         public static void ConfigureRepositoryWrapper(this IServiceCollection services)
@@ -46,7 +59,9 @@ namespace SmartProject
             services.AddDbContext<ApplicationDbContext>(options =>
               options.UseSqlServer(
                   config.GetConnectionString("ConnectionStrings")));
+           
             services.AddIdentity<ApplicationUser, IdentityRole>()
+
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
         }

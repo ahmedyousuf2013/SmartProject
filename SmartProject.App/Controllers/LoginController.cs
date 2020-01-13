@@ -13,7 +13,6 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using SmartProject.App.Models;
 using SmartProject.Data;
-using SmartProject.Models.Model;
 
 namespace SmartProject.App.Controllers
 {

@@ -26,7 +26,9 @@ using IEmailSender = SmartProject.Services.IEmailSender;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
-using Microsoft.AspNetCore.SpaServices.AngularCli;
+using AutoMapper;
+using SmartProject.Model.Helper;
+//using Microsoft.AspNetCore.SpaServices.AngularCli;
 
 namespace SmartProject
 {
@@ -56,6 +58,14 @@ namespace SmartProject
             services.ConfigurePassword();
             services.ConfigureApplicationCookie();
             services.AddTransient<IEmailSender, EmailSender>();
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new AutoMapperProfiles());
+            });
+
+
+            IMapper mapper = mappingConfig.CreateMapper();
+            services.AddSingleton(mapper);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
             .ConfigureApplicationPartManager(apm =>
@@ -87,6 +97,11 @@ namespace SmartProject
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
 
+
+            app.UseCors(options =>
+                options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+           // app.UseMvc();
+
             //////
             if (env.IsDevelopment())
             {
@@ -98,16 +113,16 @@ namespace SmartProject
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
-            app.UseSpa(spa =>
-            {
-                spa.Options.SourcePath = "ClientApp";
+            //app.UseSpa(spa =>
+            //{
+            //    spa.Options.SourcePath = "ClientApp";
 
-                if (env.IsDevelopment())
-                {
-                    spa.UseAngularCliServer(npmScript: "start");
-                    spa.Options.StartupTimeout = TimeSpan.FromSeconds(1000);
-                }
-            });
+            //    if (env.IsDevelopment())
+            //    {
+            //        spa.UseAngularCliServer(npmScript: "start");
+            //        spa.Options.StartupTimeout = TimeSpan.FromSeconds(1000);
+            //    }
+            //});
 
 
             /////////////
@@ -142,6 +157,7 @@ namespace SmartProject
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
             });
+     
             ////Swagger
             //app.UseSwagger();
             //app.UseSwaggerUI(c => {
