@@ -48,7 +48,6 @@
     <ProjectReference Include="..\SmartProject.RepositoryWrapper\SmartProject.RepositoryWrapper.csproj" />
     <ProjectReference Include="..\SmartProject.Repository\SmartProject.Repository.csproj" />
     <ProjectReference Include="..\SmartProject.Services\SmartProject.Services.csproj" />
-    <ProjectReference Include="..\SmartProject.UserManagement\SmartProject.UserManagement.csproj" />
   </ItemGroup>
 
 </Project>

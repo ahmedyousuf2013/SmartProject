@@ -1,33 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using SmartProject.App;
 using SmartProject.Data;
-using SmartProject.Models;
-using SmartProject.Repository;
-using SmartProject.Services;
-using SmartProject.UserManagement.Models;
-using Swashbuckle.AspNetCore.Swagger;
-using IEmailSender = SmartProject.Services.IEmailSender;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc.NewtonsoftJson;
-using AutoMapper;
 using SmartProject.Model.Helper;
+using SmartProject.Services;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using IEmailSender = SmartProject.Services.IEmailSender;
 //using Microsoft.AspNetCore.SpaServices.AngularCli;
 
 namespace SmartProject
@@ -164,6 +151,16 @@ namespace SmartProject
             //    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             //});
             CreateUserRoles(services).Wait();
+
+
+            var webSocketOptions = new WebSocketOptions()
+            {
+                KeepAliveInterval = TimeSpan.FromSeconds(120),
+                ReceiveBufferSize = 4 * 1024
+            };
+
+            app.UseWebSockets(webSocketOptions);
+            app.UseCustomWebSocketManager();
         }
 
         private async Task CreateUserRoles(IServiceProvider serviceProvider)

@@ -5,8 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using SmartProject.App;
 using SmartProject.Data;
 using SmartProject.Models;
+using SmartProject.Repository;
 using SmartProject.Repository.EmployeeRepository;
 using SmartProject.Repository.SupplierRepository;
 using SmartProject.RepositoryWrapper;
@@ -45,6 +47,8 @@ namespace SmartProject
         {
             services.AddScoped<IEmployeeRepository, EmployeeRepository>();
             services.AddScoped<ISupplierRepository, SupplierRepository>();
+            services.AddSingleton<ICustomWebSocketFactory, CustomWebSocketFactory>();
+            services.AddSingleton<ICustomWebSocketMessageHandler, CustomWebSocketMessageHandler>();
         }
 
         public static void ConfigureRepositoryWrapper(this IServiceCollection services)
