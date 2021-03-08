@@ -1,6 +1,7 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,6 +14,7 @@ using SmartProject.App.Middlewares;
 using SmartProject.Data;
 using SmartProject.Model.Helper;
 using SmartProject.Services;
+using SmartProject.WebSocketManager;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -33,6 +35,8 @@ namespace SmartProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddWebSocketManager();
             services.AddControllers().AddNewtonsoftJson();
             services.ConfigureSQLContext(Configuration);
             services.ConfigureJwtBearer(Configuration);
@@ -85,6 +89,12 @@ namespace SmartProject
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
+
+            app.UseWebSockets();
+
+            app.MapWebSocketManager("/chat", services.GetService<ChatHandler>());
+
+
             app.UseExceptionHandlerMiddleware();
 
             InitializeDatabase(app);
@@ -164,7 +174,7 @@ namespace SmartProject
             };
 
             app.UseWebSockets(webSocketOptions);
-            app.UseCustomWebSocketManager();
+       
         }
 
         private async Task CreateUserRoles(IServiceProvider serviceProvider)
@@ -196,5 +206,6 @@ namespace SmartProject
 
             }
         }
+
     }
 }
