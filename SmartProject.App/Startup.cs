@@ -90,6 +90,8 @@ namespace SmartProject
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
 
+            app.UseCustomMiddleware();
+
             app.UseWebSockets();
 
             app.MapWebSocketManager("/chat", services.GetService<ChatHandler>());
