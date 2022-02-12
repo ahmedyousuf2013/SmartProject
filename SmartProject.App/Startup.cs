@@ -1,16 +1,20 @@
 using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using SmartProject.App;
+using SmartProject.App.Middlewares;
 using SmartProject.Data;
 using SmartProject.Model.Helper;
 using SmartProject.Services;
+using SmartProject.WebSocketManager;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -31,6 +35,8 @@ namespace SmartProject
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            services.AddWebSocketManager();
             services.AddControllers().AddNewtonsoftJson();
             services.ConfigureSQLContext(Configuration);
             services.ConfigureJwtBearer(Configuration);
@@ -58,7 +64,7 @@ namespace SmartProject
             .ConfigureApplicationPartManager(apm =>
             {
                 var dependentLibrary = apm.ApplicationParts
-                    .FirstOrDefault(part => part.Name == "SmartProject.UserManagement"||part.Name== "SmartProject.API");
+                    .FirstOrDefault(part => part.Name == "SmartProject.UserManagement" || part.Name == "SmartProject.API");
             });
 
             //////
@@ -84,9 +90,20 @@ namespace SmartProject
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IServiceProvider services)
         {
 
+            app.UseCustomMiddleware();
+
+            app.UseWebSockets();
+
+            app.MapWebSocketManager("/chat", services.GetService<ChatHandler>());
+
+
+            app.UseExceptionHandlerMiddleware();
+
+            InitializeDatabase(app);
 
             app.UseCors(options =>
                 options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            // app.UseMvc();
 
             //////
             if (env.IsDevelopment())
@@ -143,7 +160,7 @@ namespace SmartProject
                     pattern: "{controller=Home}/{action=Index}/{id?}");
 
             });
-     
+
             ////Swagger
             //app.UseSwagger();
             //app.UseSwaggerUI(c => {
@@ -159,7 +176,7 @@ namespace SmartProject
             };
 
             app.UseWebSockets(webSocketOptions);
-            app.UseCustomWebSocketManager();
+       
         }
 
         private async Task CreateUserRoles(IServiceProvider serviceProvider)
@@ -182,5 +199,15 @@ namespace SmartProject
             await UserManager.AddToRoleAsync(user, "Admin");
 
         }
+
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using (var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
+            {
+                scope.ServiceProvider.GetRequiredService<ApplicationDbContext>().Database.Migrate();
+
+            }
+        }
+
     }
 }

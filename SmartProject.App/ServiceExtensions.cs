@@ -1,20 +1,24 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using SmartProject.App;
+using SmartProject.App.Middlewares;
 using SmartProject.Data;
 using SmartProject.Models;
 using SmartProject.Repository;
 using SmartProject.Repository.EmployeeRepository;
 using SmartProject.Repository.SupplierRepository;
 using SmartProject.RepositoryWrapper;
+using SmartProject.WebSocketManager;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -49,6 +53,7 @@ namespace SmartProject
             services.AddScoped<ISupplierRepository, SupplierRepository>();
             services.AddSingleton<ICustomWebSocketFactory, CustomWebSocketFactory>();
             services.AddSingleton<ICustomWebSocketMessageHandler, CustomWebSocketMessageHandler>();
+            services.AddWebSocketManager();
         }
 
         public static void ConfigureRepositoryWrapper(this IServiceCollection services)
@@ -138,5 +143,7 @@ namespace SmartProject
                 options.SlidingExpiration = true;
             });
         }
+
+      
     }
 }
