@@ -87,7 +87,6 @@ namespace SmartProject
 
             app.UseCors(options =>
                 options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
-           // app.UseMvc();
 
             //////
             if (env.IsDevelopment())
